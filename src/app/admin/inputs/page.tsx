@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { Settings, Download, Upload, Save, Plus, Edit, Trash2, Zap } from 'lucide-react';
+import { Settings, Download, Upload, Save, Plus, Edit, Trash2, Zap, BarChart3, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatValue } from '@/lib/utils';
 import type { KPI, KPISnapshot } from '@/lib/supabase';
 import EventSender from '@/components/EventSender';
+import Link from 'next/link';
 
 interface InputData {
   [kpiId: string]: { [period: string]: number | null };
@@ -371,6 +372,27 @@ function AdminInputsContent() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Navigation Bar */}
+      <nav className="bg-white border-b border-slate-200">
+        <div className="mx-auto max-w-7xl px-6 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Link href="/dashboard" className="flex items-center space-x-2 text-slate-600 hover:text-slate-900">
+                <BarChart3 className="w-5 h-5" />
+                <span className="font-medium">メインダッシュボード</span>
+              </Link>
+              <span className="text-slate-400">/</span>
+              <span className="text-slate-900 font-medium">KPI管理</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Link href="/dashboard" className="text-sm text-blue-600 hover:text-blue-700">
+                ダッシュボードに戻る
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="mx-auto max-w-7xl p-6">
         {/* Header */}
         <header className="mb-8">
@@ -378,12 +400,21 @@ function AdminInputsContent() {
             <div>
               <h1 className="text-3xl font-bold text-slate-900 mb-2 flex items-center space-x-2">
                 <Settings className="w-8 h-8 text-blue-600" aria-hidden="true" />
-                <span>KPI データ入力</span>
+                <span>KPI データ入力・管理</span>
               </h1>
               <p className="text-slate-600">月次KPIデータの手動入力・管理画面</p>
             </div>
             
             <div className="flex space-x-3">
+              <Link href="/dashboard">
+                <button
+                  className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  aria-label="ダッシュボードに戻る"
+                >
+                  <BarChart3 className="w-4 h-4" aria-hidden="true" />
+                  <span>ダッシュボード</span>
+                </button>
+              </Link>
               <button
                 onClick={() => setShowKpiForm(true)}
                 className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { DashboardContent } from '@/components/DashboardContent';
 import Link from 'next/link';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Settings, ArrowLeft } from 'lucide-react';
 
 export default function DashboardPage() {
   return (
@@ -26,7 +26,7 @@ export default function DashboardPage() {
               className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 cursor-pointer"
               aria-label="管理者画面を開く"
             >
-              <Home className="w-4 h-4" aria-hidden="true" />
+              <Settings className="w-4 h-4" aria-hidden="true" />
               <span>管理者画面</span>
             </Link>
           </div>
