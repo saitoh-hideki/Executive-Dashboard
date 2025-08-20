@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { Settings, Download, Upload, Save, Plus, Edit, Trash2 } from 'lucide-react';
+import { Settings, Download, Upload, Save, Plus, Edit, Trash2, Zap } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { formatValue } from '@/lib/utils';
 import type { KPI, KPISnapshot } from '@/lib/supabase';
+import EventSender from '@/components/EventSender';
 
 interface InputData {
   [kpiId: string]: { [period: string]: number | null };
@@ -21,8 +22,8 @@ interface NewKPI {
   description: string;
   unit_type: 'ratio' | 'currency' | 'count' | 'index' | 'per_capita';
   source_type: 'manual' | 'internal' | 'external';
-  goal?: number;
-  warn?: number;
+  goal?: number | undefined;
+  warn?: number | undefined;
 }
 
 function AdminInputsContent() {
@@ -532,6 +533,18 @@ function AdminInputsContent() {
             <li>• 空欄の場合はデータなしとして扱われます</li>
             <li>• 保存ボタンを押すまで変更は反映されません</li>
           </ul>
+        </div>
+
+        {/* イベント送信テスト */}
+        <div className="mt-8">
+          <div className="flex items-center space-x-2 mb-4">
+            <Zap className="w-6 h-6 text-orange-600" />
+            <h2 className="text-xl font-semibold text-slate-900">イベント送信テスト</h2>
+          </div>
+          <p className="text-slate-600 mb-4">
+            OrgShift各アプリからのイベント送信をシミュレートして、データ連携をテストできます。
+          </p>
+          <EventSender />
         </div>
 
         {/* KPI追加・編集モーダル */}

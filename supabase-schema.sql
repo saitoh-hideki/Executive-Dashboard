@@ -154,14 +154,14 @@ BEGIN
     (org_id, '営業'),
     (org_id, '開発');
   
-  -- KPI定義
-  INSERT INTO kpis (code, name, unit_type, source_type, thresholds) VALUES
-    ('profit_per_employee', '利益/従業員', 'currency', 'manual', '{"goal":1800000,"warn":1200000}'),
-    ('sales_conversion_rate', '成約率', 'ratio', 'manual', '{"goal":0.30,"warn":0.20}'),
-    ('turnover_rate', '離職率', 'ratio', 'manual', '{"goal":0.05,"warn":0.08}'),
-    ('hiring_cost_per_head', '採用コスト/人', 'currency', 'manual', '{"goal":300000,"warn":450000}'),
-    ('learning_progress', '学習進捗率', 'ratio', 'internal', '{"goal":0.75,"warn":0.60}'),
-    ('motivation_index', 'モチベ指数', 'index', 'internal', '{"goal":70,"warn":50}');
+  -- KPI定義（仕様書の必須6点）
+  INSERT INTO kpis (code, name, description, unit_type, source_type, source_connector, calc_formula, thresholds, dimensions, visible_roles) VALUES
+    ('profit_per_employee', '利益/従業員', '営業利益を従業員数で割った値。最重要KPI。', 'currency', 'manual', 'manual_form', 'gross_profit / headcount', '{"goal":1800000,"warn":1200000}', ARRAY['department','period'], ARRAY['executive','hr','admin']),
+    ('sales_conversion_rate', '成約率', '商談から成約への転換率。', 'ratio', 'manual', 'manual_form', 'closed_deals / total_opportunities', '{"goal":0.30,"warn":0.20}', ARRAY['department','period'], ARRAY['executive','sales','admin']),
+    ('turnover_rate', '離職率', '従業員の離職率。', 'ratio', 'manual', 'manual_form', 'departures / average_headcount', '{"goal":0.05,"warn":0.08}', ARRAY['department','period'], ARRAY['executive','hr','admin']),
+    ('hiring_cost_per_head', '採用コスト/人', '1人採用するための総コスト。', 'currency', 'manual', 'manual_form', 'total_hiring_cost / new_hires', '{"goal":300000,"warn":450000}', ARRAY['department','period'], ARRAY['executive','hr','admin']),
+    ('learning_progress', '学習進捗率', '従業員の学習完了率。', 'ratio', 'internal', 'motivation', 'completed_tasks / total_assigned_tasks', '{"goal":0.75,"warn":0.60}', ARRAY['department','period'], ARRAY['executive','hr','admin']),
+    ('motivation_index', 'モチベ指数', '達成タスク数と応援数の合成指数。', 'index', 'internal', 'motivation', 'achievement_score * support_score', '{"goal":70,"warn":50}', ARRAY['department','period'], ARRAY['executive','hr','admin']);
   
   -- サンプルスナップショット（2025年7月）
   INSERT INTO kpi_snapshots (org_id, kpi_id, period_date, value)

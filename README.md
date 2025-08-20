@@ -1,193 +1,192 @@
 # OrgShift Executive Dashboard
 
-経営が「ひと目で」会社の状態を把握し、学び→モチベ→利益の関係を明確化する次世代エグゼクティブダッシュボード
+オーグシフト・シリーズ（Motivation / Quiz / Roleplay / Insight / Local / WorkLink）と連携するエグゼクティブダッシュボードです。
 
-## 機能
+## 🚀 主要機能
 
-- **KPI可視化**: 利益/人、成約率、離職率、採用コスト、学習進捗、モチベ指数を統合表示
-- **AIインサイト**: データを自動分析し、経営判断に必要な洞察を自然言語で提供
-- **拡張設計**: KPIメタデータ管理により、コード変更なしで指標追加・変更が可能
-- **AIチャット**: KPIデータを参照した具体的なアドバイスと経営相談
+### 1. KPI管理・可視化
+- **必須6KPI**の自動表示・追跡
+  - 利益/従業員（profit_per_employee）
+  - 成約率（sales_conversion_rate）
+  - 離職率（turnover_rate）
+  - 採用コスト/人（hiring_cost_per_head）
+  - 学習進捗率（learning_progress）
+  - モチベ指数（motivation_index）
+- リアルタイムKPIカード生成
+- 期間別トレンド分析
+- 相関分析チャート
 
-## 技術スタック
+### 2. データ連携（OrgShift Data Sharing）
+- **統一イベント形式**で各アプリからデータ受信
+- **Ingest Edge Function**による自動KPI変換
+- 共通ID・共通KPI・共通イベントの契約
+- 新アプリ追加時の最小改修
 
-- **フロントエンド**: Next.js 15, React 19, TypeScript
-- **スタイリング**: Tailwind CSS v4
-- **バックエンド**: Supabase (PostgreSQL, Edge Functions)
-- **チャート**: Recharts
-- **アイコン**: Lucide React
+### 3. AIインサイト
+- KPIデータに基づく自動分析
+- 自然言語での質問応答
+- 相関関係の自動発見
 
-## セットアップ
+## 🏗️ アーキテクチャ
 
-### 1. 依存関係のインストール
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   OrgShift      │    │   Ingest Edge    │    │   Dashboard     │
+│   Apps          │───▶│   Function       │───▶│   (Next.js)     │
+│                 │    │                  │    │                 │
+│ • Motivation    │    │ • イベント受信     │    │ • KPI表示       │
+│ • Quiz          │    │ • KPI変換        │    │ • トレンド分析   │
+│ • Roleplay      │    │ • データ正規化    │    │ • AIインサイト   │
+│ • Local         │    │ • スナップショット │    │ • 保存           │
+│ • WorkLink      │    │   保存           │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
 
+## 📊 データフロー
+
+### 1. イベント送信
+各アプリは以下の形式でイベントを送信：
+
+```typescript
+type OrgShiftEvent = {
+  org_id: string;           // 組織ID（必須）
+  department_id?: string;   // 部署ID（オプション）
+  app: string;              // アプリ名
+  event: string;            // イベント名
+  period_date: string;      // 期間（月初日）
+  kpi_candidates: {         // KPI候補
+    kpi_code: string;
+    value: number;
+    unit_type: KpiUnit;
+  }[];
+  meta?: Record<string, any>;
+}
+```
+
+### 2. 自動変換
+Ingest Edge Functionが：
+- イベントを検証・正規化
+- KPIコードを解決
+- スナップショットに変換・保存
+
+### 3. ダッシュボード表示
+- KPIメタデータ駆動の自動カード生成
+- リアルタイム更新
+- 相関分析・AIインサイト
+
+## 🛠️ セットアップ
+
+### 1. 依存関係インストール
 ```bash
 npm install
 ```
 
-### 2. 環境変数の設定
-
-`.env.local` ファイルを作成し、以下の環境変数を設定してください：
-
+### 2. 環境変数設定
 ```bash
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://sqzweukebvzrgqbxsywc.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxendldWtlYnZ6cmdxYnhzeXdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTg4NDIsImV4cCI6MjA3MTIzNDg0Mn0.9SAQEKSXigpxEcbqN1jHH5XHzxNLtIlawxBRtJ4_JHg
-
-# 開発環境設定
-NODE_ENV=development
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 3. Supabaseの設定
+### 3. データベース初期化
+```bash
+# supabase-schema.sqlを実行
+psql -h your_host -U your_user -d your_db -f supabase-schema.sql
+```
 
-**プロジェクト情報:**
-- プロジェクト名: Executive Dashboard
-- プロジェクトID: `sqzweukebvzrgqbxsywc`
-- リージョン: Northeast Asia (Tokyo)
-- ダッシュボード: https://supabase.com/dashboard/project/sqzweukebvzrgqbxsywc
-
-**Edge Functions:**
-- `ai-chat`: AIチャット機能 ✅ デプロイ済み
-- `get-ai-insights`: AIインサイト生成 ✅ デプロイ済み
-
-**データベース:**
-- スキーマ: `supabase-schema.sql` の内容で設定済み
-- サンプルデータ: 初期データが投入済み
-
-### 4. 開発サーバーの起動
-
+### 4. 開発サーバー起動
 ```bash
 npm run dev
 ```
 
-## 使用方法
+## 🔧 開発・テスト
 
-### ダッシュボード
+### イベント送信テスト
+管理画面（`/admin/inputs?admin=ADMIN-ORG-A`）で：
+- 各アプリのイベント送信をシミュレート
+- データ連携の動作確認
+- KPI変換の検証
 
-- `/dashboard` - メインダッシュボード
-- 主要KPIの表示
-- トレンド分析と相関分析
-- AIインサイトの表示
+### 新KPI追加
+1. `kpis`テーブルに1レコード追加
+2. ダッシュボードに自動表示
+3. 必要に応じてIngestマッピング追加
 
-### 管理者機能
+### 新アプリ連携
+1. 共通イベント形式でデータ送信
+2. `sendEvent()`関数を使用
+3. ダッシュボード側の変更は不要
 
-- `/admin/inputs?admin=ADMIN-ORG-A` - KPIデータ入力画面
-- 月次データの手動入力
-- CSVインポート/エクスポート
-
-### AI機能
-
-- ダッシュボード右下のチャットボタンからAIアシスタントにアクセス
-- KPIモード：データに基づく具体的な回答
-- 相談モード：経営に関する一般的なアドバイス
-
-## プロジェクト構造
+## 📁 プロジェクト構造
 
 ```
-src/
-├── app/                    # Next.js App Router
-│   ├── dashboard/         # ダッシュボードページ
-│   ├── admin/            # 管理者機能
-│   └── globals.css       # グローバルスタイル
-├── components/            # Reactコンポーネント
-│   ├── DashboardContent.tsx
-│   ├── KpiCard.tsx
-│   ├── TrendChart.tsx
-│   ├── CorrelationChart.tsx
-│   ├── AiInsights.tsx
-│   ├── AiChat.tsx
-│   └── PeopleUtilization.tsx
-└── lib/                  # ユーティリティ
-    ├── supabase.ts       # Supabaseクライアント
-    └── utils.ts          # ヘルパー関数
-
-supabase/
-├── functions/            # Edge Functions
-│   ├── ai-chat/         # AIチャット機能 ✅ デプロイ済み
-│   └── get-ai-insights/ # AIインサイト生成 ✅ デプロイ済み
-└── _shared/             # 共有モジュール
+orgshift-dashboard/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── dashboard/       # メインダッシュボード
+│   │   ├── admin/           # 管理画面
+│   │   └── globals.css      # グローバルスタイル
+│   ├── components/          # Reactコンポーネント
+│   │   ├── KpiCard.tsx      # KPIカード
+│   │   ├── TrendChart.tsx   # トレンドチャート
+│   │   ├── EventSender.tsx  # イベント送信テスト
+│   │   └── ...
+│   └── lib/                 # ユーティリティ
+│       ├── types.ts         # 共通型定義
+│       ├── supabase.ts      # Supabase設定
+│       └── utils.ts         # ヘルパー関数
+├── supabase/
+│   ├── functions/           # Edge Functions
+│   │   └── ingest/          # データ受信
+│   └── ...
+├── supabase-schema.sql      # データベーススキーマ
+└── package.json
 ```
 
-## 開発
+## 🔒 セキュリティ
 
-### ビルド
+### プロトタイプ環境
+- RLS OFF（開発用）
+- 固定トークン認証
+- CORS許可
 
-```bash
-npm run build
+### 本番環境
+- RLS ON（行レベル制御）
+- HMAC-SHA256署名検証
+- SSO + RBAC
+- 組織別データ分離
+
+## 📈 拡張性
+
+### 新KPI追加
+```sql
+INSERT INTO kpis (code, name, unit_type, source_type) 
+VALUES ('new_kpi', '新KPI', 'ratio', 'internal');
 ```
 
-### リント
-
-```bash
-npm run lint
+### 新アプリ連携
+```typescript
+// イベント送信のみ
+await sendEvent({
+  org_id: 'org_id',
+  app: 'new_app',
+  event: 'new_event',
+  period_date: '2025-07-01',
+  kpi_candidates: [...]
+});
 ```
 
-### 型チェック
+## 🤝 コントリビューション
 
-```bash
-npx tsc --noEmit
-```
+1. イシューの作成
+2. フィーチャーブランチの作成
+3. コードの実装・テスト
+4. プルリクエストの作成
 
-## Supabase管理
-
-### Edge Functionsの再デプロイ
-
-```bash
-# プロジェクトにリンク
-supabase link --project-ref sqzweukebvzrgqbxsywc
-
-# 関数をデプロイ
-supabase functions deploy ai-chat
-supabase functions deploy get-ai-insights
-```
-
-### データベースの管理
-
-```bash
-# スキーマの適用
-supabase db push
-
-# データベースの状態確認
-supabase db diff
-```
-
-### シークレットの管理
-
-```bash
-# シークレットの一覧表示
-supabase secrets list
-
-# シークレットの設定
-supabase secrets set SECRET_NAME=value
-```
-
-## トラブルシューティング
-
-### 環境変数が設定されていない場合
-
-```
-Error: NEXT_PUBLIC_SUPABASE_URL is not defined
-```
-
-→ `.env.local` ファイルが正しく設定されているか確認してください
-
-### Supabase接続エラー
-
-```
-Error: Failed to fetch
-```
-
-→ SupabaseのURLとAPIキーが正しいか確認してください
-
-### Edge Functionsが動作しない場合
-
-→ Supabase Dashboardで関数のログを確認してください
-→ https://supabase.com/dashboard/project/sqzweukebvzrgqbxsywc/functions
-
-### Tailwind CSSが適用されない場合
-
-→ `npm run dev` を再起動してください
-
-## ライセンス
+## 📄 ライセンス
 
 MIT License
+
+---
+
+**OrgShift Executive Dashboard** - オーグシフト・シリーズの統合データ可視化プラットフォーム
